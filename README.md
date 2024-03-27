@@ -4,6 +4,8 @@ Since MS Excel workbooks are binary file formats, they are not suitable for revi
 
 A [Bash script](./pre-commit/pre-commit) and a [Python script](./pre-commit/pre-commit.py) together export macros contained in workbooks.
 
+These scripts are tested only on MS Windows.
+
 &nbsp;
 
 ## Requirement
