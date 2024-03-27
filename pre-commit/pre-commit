@@ -1,0 +1,57 @@
+#!/bin/sh
+
+VBA_DIR='src.vba'
+WS_UNWANTED='Confidential'
+EXCEL_FILE_EXTENSIONS=('xlsb' 'xls' 'xlsm' 'xla' 'xlt' 'xlam')
+CACHED_FILES=($(git diff-index --cached --name-only HEAD))
+
+function any_excel_file() {
+    local found=false
+    local file_ext=''
+    local ext=''
+
+    for cached_file in "${CACHED_FILES[@]}"
+    do
+        file_ext="${cached_file##*.}"
+        for ext in "${EXCEL_FILE_EXTENSIONS[@]}"
+        do
+            if [[ "$file_ext" == "$ext" ]]
+            then
+                found=true
+                break
+            fi
+        done
+
+        if $found
+        then
+            break
+        fi
+    done
+
+    if $found
+    then
+        true
+    else
+        false
+    fi
+}
+
+if any_excel_file
+then
+    excel_exts=$(printf ":%s" "${EXCEL_FILE_EXTENSIONS[@]}")
+    excel_exts=${excel_exts:1}
+
+    if python .git/hooks/pre-commit.py "${VBA_DIR}" "${excel_exts}" "${WS_UNWANTED}" "${CACHED_FILES[@]}"
+    then
+        if [[ -d ./src.vba ]]
+        then
+            git add -- ./src.vba
+        fi
+        exit 0
+    else
+        echo "** FAILURE: unwanted worksheet"
+        exit 1
+    fi
+fi
+
+exit 0
