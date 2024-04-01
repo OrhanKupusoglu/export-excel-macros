@@ -1,10 +1,8 @@
 # Export MS Excel Macros
 
-Since MS Excel workbooks are binary file formats, they are not suitable for revision control.
+Since [MS Excel](https://en.wikipedia.org/wiki/Microsoft_Excel) workbooks are binary file formats, they are not suitable for revision control.
 
-A [Bash script](./pre-commit/pre-commit) and a [Python script](./pre-commit/pre-commit.py) together export macros contained in workbooks.
-
-These scripts are tested only on MS Windows.
+An MS Excel workbook containing macros, if added to [Git](https://en.wikipedia.org/wiki/Git), should be able to export all the source codes with each commit.
 
 &nbsp;
 
@@ -23,6 +21,10 @@ The Python tool [oletools](https://pypi.org/project/oletools/) is required to ex
 The [Pro Git book](https://git-scm.com/book/en/v2) explains [Git Hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) in great detail:
 
 > Like many other Version Control Systems, Git has a way to fire off custom scripts when certain important actions occur.
+
+A [Bash script](./pre-commit/pre-commit) and a [Python script](./pre-commit/pre-commit.py) together export macros contained in MS Excel workbooks.
+
+These scripts are tested only on MS Windows.
 
 &nbsp;
 
@@ -55,3 +57,64 @@ The Python script may check for exact matches, by default a partial match filter
 EXACT_MATCH = False
 ```
 
+&nbsp;
+
+## Example
+
+After first copying the pre-commit hook scripts, an MS Excel file containing two VBA modules is added to the test repository:
+
+```
+>TREE /F
+Folder PATH listing for volume Windows
+Volume serial number is EX47-DA1E
+C:.
+    LICENSE
+    README.md
+
+No subfolders exist
+
+>COPY ..\export-excel-macros\pre-commit\* .git\hooks
+..\export-excel-macros\pre-commit\pre-commit
+..\export-excel-macros\pre-commit\pre-commit.py
+        2 file(s) copied.
+
+>MKDIR workbook
+
+>MOVE ..\test.xlsm workbook\.
+        1 file(s) moved.
+
+>git status
+On branch main
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        workbook/
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+>git add workbook
+
+>git commit -m "Add a macro-containing MS Excel workbook"
+[main 93d90d4] Add a macro-containing MS Excel workbook
+ 3 files changed, 2174 insertions(+)
+ create mode 100644 src.vba/Calculations.bas
+ create mode 100644 src.vba/Init.bas
+ create mode 100644 workbook/test.xlsm
+
+>git status
+On branch main
+nothing to commit, working tree clean
+
+>TREE /F
+Folder PATH listing for volume Windows
+Volume serial number is EX47-DA1E
+C:.
+│   LICENSE
+│   README.md
+│
+├───src.vba
+│       Calculations.bas
+│       Init.bas
+│
+└───workbook
+        test.xlsm
+```
